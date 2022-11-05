@@ -1,20 +1,22 @@
 <html>
   <title>Google Sheets json endpoint V4</title>
-  <author>Mike Steelson</author>
   <style>
   table {border-collapse: collapse;}
   th,td{border: 1px solid black;}
   </style>
   <body>
-    <form>
+    
         <div>
           <label for="example">Let's submit some text</label>
-          <input id="example" type="text" name="text" />
+          <input id="itemId" type="text" name="text" />
         </div>
         <div>
-          <input type="submit" value="Send" accesskey="s" />
+          <input onClick="getStatus()" type="button" value="Send" accesskey="s" />
+<button onclick="myFunction()">Click me</button>
+
         </div>
-      </form>
+      <p id="demo"></p>
+	<div id="status"></div>
     <div id="json">json here</div>
     <script>
       var id = '1QxyCkv1LSmXEqr6ZQnmvzBkYCYNcaT5UBiJc5SoiQJQ';
@@ -24,6 +26,18 @@
         .then(response => response.text())
         .then(data => document.getElementById("json").innerHTML=myItems(data.substring(47).slice(0, -2))  
         );
+		var itemMap = {}
+		function myFunction() {
+  var itemId = document.getElementById("itemId").value
+var status = itemMap[itemId]
+document.getElementById("demo").innerHTML = "Hello World";
+
+document.getElementById("status").innerHTML="Status: " + status
+}
+		function getStatus(){
+			var itemId = document.getElementById("itemId").value
+			document.getElementById("status").innerHtml=itemMap[itemId]
+		}
       function myItems(jsonString){
         var json = JSON.parse(jsonString);
         var table = '<table><tr>'
@@ -31,16 +45,35 @@
         table += '</tr>'
         json.table.rows.forEach(ligne => {
           table += '<tr>'
+	var colIndex = 0;
+	var colKey = '';
+	var colValue = '';
           ligne.c.forEach(cellule => {
               try{var valeur = cellule.f ? cellule.f : cellule.v}
               catch(e){var valeur = ''}
+	if(colIndex==0){
+		colKey = valeur;
+	} else if(colIndex==1){
+		colValue = valeur;
+	}
+	colIndex++
               table += '<td>' + valeur + '</td>'
             }
           )
+	itemMap[colKey] = colValue;
+	
           table += '</tr>'
           }
         )
         table += '</table>'
+	//itemMap.forEach(item => {
+		//table += item
+	//})
+	Object.entries(itemMap).forEach(entry => {
+  const [key, value] = entry;
+  //console.log(key, value);
+  table+=key+':'+value
+});
         return table
       }           
     </script>
